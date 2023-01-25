@@ -10,10 +10,10 @@ import Sort, { list }  from '../components/Sort.jsx';
 import Placeholder from '../components/PizzaBlock/Placeholder';
 import Pagination from "../components/pagination/index.jsx";
 import { SearchContext } from "../App.js";
-import { setCategoryId, setCurrentPage, setSort } from "../redux/slice/filterSlice.js";
+import { filterSelector, setCategoryId, setCurrentPage, setSort } from "../redux/slice/filterSlice.js";
 
 import { setFilters } from "../redux/slice/filterSlice.js";
-import {fetchPizza} from '../redux/slice/pizzaSlice'
+import {fetchItem, selectorPizzaData} from '../redux/slice/pizzaSlice'
 
 
 const Home = () => {
@@ -25,12 +25,10 @@ const Home = () => {
   // const currentPage = useSelector((state) => state.filterSlice.currentPage);
   // эти константы перенесены ниже
 
-   const {sort, currentPage, categoryId} = useSelector((state) => state.filterSlice)
-  const items = useSelector((state) => state.pizzaSlice.items) 
-
-    const {search} = React.useContext(SearchContext);
+   const {sort, currentPage, categoryId, searchValue} = useSelector(filterSelector)
+  const {items, status} = useSelector(selectorPizzaData); 
   //  const [pizza, setPizza] = React.useState([]);
-    const [isLoad, setIsLoad] = React.useState(true);   
+  //  const [isLoad, setIsLoad] = React.useState(true);   
     
 
     const onChangeCats = (id) => {
@@ -57,34 +55,24 @@ const Home = () => {
 //   window.scrollTo(0, 0);
 
     const fetchPizza = async () => {
-      setIsLoad(true);
+      //setIsLoad(true);
 
       const order = sort.sortProp.includes('-') ? 'asc' : 'desc';
       const sortBy = sort.sortProp.replace('-', '');
       const category = categoryId > 0 ? `category=${categoryId}` : '';
-      const searchBy = search ? `&searchBy=${search}` : '';
+      const searchBy = searchValue ? `&searchBy=${searchValue}` : '';
 
-       try {   
         
-
-
         /* setPizza(res.data); 
         замена на dispatch, потому что храним в rtk*/
-       dispatch(fetchPizza({
+       dispatch(fetchItem({
         order,
         sortBy,
         category,
         searchBy,
         currentPage,
-       }))
-        setIsLoad(false);
-        console.log(212121);
-        } catch (error) {
-          setIsLoad(false);
-         // console.log ('error', error);
-        } finally {
-          setIsLoad(false);
-        };
+       }),
+       );
         window.scrollTo(0, 0);
       };
       
@@ -127,7 +115,7 @@ const Home = () => {
 
   React.useEffect(() => {
     fetchPizza();
-  }, []);
+  }, [categoryId, currentPage, searchValue, sort.sortProp]);
 
 
   React.useEffect(() => {
@@ -136,7 +124,7 @@ const Home = () => {
       fetchPizza();
     }
     isSearch.current = false;
-  }, [categoryId, currentPage, search, sort.sortProp])
+  }, [])
 
     const pitca = items.map((obj) => <PizzaBlock key={obj.id} {...obj}/>)
 
@@ -149,10 +137,17 @@ const Home = () => {
             <Sort value={sort}/>
           </div>
           <h2 className="content__title">Все пиццы</h2>
-          <div className="content__items">
-            {
-              isLoad ? skelet : pitca}
+          {
+            status === 'error' ? (
+              <div>
+                <h2>Пицц нет</h2>
+              </div>
+            ) : (
+              <div className="content__items">{status === 'loading' ? skelet : pitca}
           </div>
+            )
+          }
+          
           <Pagination currentPage={currentPage} onChangePage={(number) => onChangePage(number)}/>
         </div>
     )

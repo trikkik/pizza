@@ -6,15 +6,11 @@ import Error from './pages/Error';
 import Cart from './pages/Cart';
 import { Route, Routes } from 'react-router-dom';
 
-//import pizzas from './assets/pizzas.json';
-export const SearchContext = React.createContext('');
+
 
 function App() {
-  const [search, setSearch] = React.useState('');
-
   return (
     <div className="wrapper">
-      <SearchContext.Provider value={{ search, setSearch }}>
         <Header />
         <div className="content">
           <Routes>
@@ -23,7 +19,6 @@ function App() {
             <Route path="/cart" element={<Cart />} />
           </Routes>
         </div>
-      </SearchContext.Provider>
     </div>
   );
 }

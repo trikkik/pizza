@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { sortSelector } from "../redux/slice/filterSlice";
 import {setSort} from '../redux/slice/filterSlice'
 
 
@@ -15,8 +16,8 @@ function Sort() {
 
   const dispatch = useDispatch();
 
-  const sort = useSelector((state) => state.filterSlice.sort);
-  const sortId = useSelector((state) => state.filterSlice.sort.sortProp)
+  const sort = useSelector(sortSelector);
+  //const sortId = useSelector((state) => state.filterSlice.sort.sortProp)
 
   const [lightPopup, setLightPopup] = React.useState(false);
 
